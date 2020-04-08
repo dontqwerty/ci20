@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+measurements_1.data
+measurements_2.data
+measurements_3.data
+reference_1.data
+reference_2.data
+reference_3.data
