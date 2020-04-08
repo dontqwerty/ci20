@@ -71,6 +71,15 @@ def parameter_estimation(reference_measurement,nr_anchors,p_anchor,p_ref):
         p_ref... reference point, 2x2 """
     params = np.zeros([1, nr_anchors])
 
+    for i in reference_measurement.T :
+        ax = sns.distplot(i,
+                  kde=True,
+                  bins=100,
+                  color='skyblue',
+                  hist_kws={"linewidth": 15,'alpha':1})
+        ax.set(xlabel='Given Distribution', ylabel='Frequency')
+        plt.show() 
+
     t_reference_measurement = np.transpose(reference_measurement)
     # mean_anchors = np.array([t_reference_measurement[0].mean(),
     #                         t_reference_measurement[1].mean(),
