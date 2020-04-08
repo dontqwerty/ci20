@@ -84,21 +84,22 @@ def parameter_estimation(reference_measurement,nr_anchors,p_anchor,p_ref):
         plt.show() 
     #TODO (2) estimate the according parameter based
     t_reference_measurement = np.transpose(reference_measurement)
+    t_reference_measurement_size = np.size(t_reference_measurement[0],0)
     if (scenario == 1) :
         params = np.array([np.cov(t_reference_measurement[0]),
                         np.cov(t_reference_measurement[1]),
                         np.cov(t_reference_measurement[2]),
                         np.cov(t_reference_measurement[3])])
     elif (scenario == 2) :
-        params = np.array([2000 / sum(t_reference_measurement[0]),
+        params = np.array([t_reference_measurement_size / sum(t_reference_measurement[0]),
                         np.cov(t_reference_measurement[1]),
                         np.cov(t_reference_measurement[2]),
                         np.cov(t_reference_measurement[3])])
     elif (scenario == 3) :
-        params = np.array([2000 / sum(t_reference_measurement[0]),
-                        2000 / sum(t_reference_measurement[1]),
-                        2000 / sum(t_reference_measurement[2]),
-                        2000 / sum(t_reference_measurement[3])])
+        params = np.array([t_reference_measurement_size / sum(t_reference_measurement[0]),
+                        t_reference_measurement_size / sum(t_reference_measurement[1]),
+                        t_reference_measurement_size / sum(t_reference_measurement[2]),
+                        t_reference_measurement_size / sum(t_reference_measurement[3])])
     print(params)
     return params
 #--------------------------------------------------------------------------------
