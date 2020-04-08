@@ -170,7 +170,7 @@ def plot_gauss_contour(mu,cov,xmin,xmax,ymin,ymax,title="Title"):
     X, Y = np.mgrid[xmin:xmax:delta, ymin:ymax:delta]
     pos = np.dstack((X, Y))
                     
-    Z = n5p.stats.multivariate_normal(mu, cov)
+    Z = np.stats.multivariate_normal(mu, cov)
     plt.plot([mu[0]],[mu[1]],'r+') # plot the mean as a single point
     plt.gca().set_aspect("equal")
     CS = plt.contour(X, Y, Z.pdf(pos),3,colors='r')
