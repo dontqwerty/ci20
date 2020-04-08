@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import scipy.stats as stats
 
 import seaborn as sns
+from scipy.stats import expon
 
 scenario = 0
 
@@ -15,7 +16,7 @@ scenario = 0
 def main():
     global scenario
     # choose the scenario
-    # scenario = 1    # all anchors are Gaussian
+    #scenario = 1    # all anchors are Gaussian
     #scenario = 2    # 1 anchor is exponential, 3 are Gaussian
     scenario = 3    # all anchors are exponential
     
@@ -72,7 +73,7 @@ def parameter_estimation(reference_measurement,nr_anchors,p_anchor,p_ref):
         p_anchor... position of anchors, nr_anchors x 2
         p_ref... reference point, 2x2 """
     params = np.zeros([1, nr_anchors])
-
+    #TODO (1) check whether a given anchor is Gaussian or exponential
     for i in reference_measurement.T :
         ax = sns.distplot(i,
                   kde=True,
@@ -81,19 +82,24 @@ def parameter_estimation(reference_measurement,nr_anchors,p_anchor,p_ref):
                   hist_kws={"linewidth": 15,'alpha':1})
         ax.set(xlabel='Given Distribution', ylabel='Frequency')
         plt.show() 
-
+    #TODO (2) estimate the according parameter based
     t_reference_measurement = np.transpose(reference_measurement)
-    cov_anchors = np.array([np.cov(t_reference_measurement[0]),
-                            np.cov(t_reference_measurement[1]),
-                            np.cov(t_reference_measurement[2]),
-                            np.cov(t_reference_measurement[3])])
-
-    
-
-    print(cov_anchors)
-
-    #TODO (1) check whether a given anchor is Gaussian or exponential
-    #TODO (2) estimate the according parameter based 
+    if (scenario == 1) :
+        params = np.array([np.cov(t_reference_measurement[0]),
+                        np.cov(t_reference_measurement[1]),
+                        np.cov(t_reference_measurement[2]),
+                        np.cov(t_reference_measurement[3])])
+    elif (scenario == 2) :
+        params = np.array([2000 / sum(t_reference_measurement[0]),
+                        np.cov(t_reference_measurement[1]),
+                        np.cov(t_reference_measurement[2]),
+                        np.cov(t_reference_measurement[3])])
+    elif (scenario == 3) :
+        params = np.array([2000 / sum(t_reference_measurement[0]),
+                        2000 / sum(t_reference_measurement[1]),
+                        2000 / sum(t_reference_measurement[2]),
+                        2000 / sum(t_reference_measurement[3])])
+    print(params)
     return params
 #--------------------------------------------------------------------------------
 def position_estimation_least_squares(data,nr_anchors,p_anchor, p_true, use_exponential):
