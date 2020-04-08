@@ -6,6 +6,8 @@ import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 import scipy.stats as stats
 
+import seaborn as sns
+
 scenario = 0
 
 #--------------------------------------------------------------------------------
@@ -13,9 +15,9 @@ scenario = 0
 def main():
     global scenario
     # choose the scenario
-    scenario = 1    # all anchors are Gaussian
-    # scenario = 2    # 1 anchor is exponential, 3 are Gaussian
-    #scenario = 3    # all anchors are exponential
+    # scenario = 1    # all anchors are Gaussian
+    #scenario = 2    # 1 anchor is exponential, 3 are Gaussian
+    scenario = 3    # all anchors are exponential
     
     # specify position of anchors
     p_anchor = np.array([[5,5],[-5,5],[-5,-5],[5,-5]])
@@ -81,20 +83,12 @@ def parameter_estimation(reference_measurement,nr_anchors,p_anchor,p_ref):
         plt.show() 
 
     t_reference_measurement = np.transpose(reference_measurement)
-    # mean_anchors = np.array([t_reference_measurement[0].mean(),
-    #                         t_reference_measurement[1].mean(),
-    #                         t_reference_measurement[2].mean(),
-    #                         t_reference_measurement[3].mean()])
     cov_anchors = np.array([np.cov(t_reference_measurement[0]),
                             np.cov(t_reference_measurement[1]),
                             np.cov(t_reference_measurement[2]),
                             np.cov(t_reference_measurement[3])])
 
-    plt.plot(t_reference_measurement[0])
-    plt.plot(t_reference_measurement[1])
-    plt.show()
-    plt.plot(t_reference_measurement[2])
-    plt.plot(t_reference_measurement[3])
+    
 
     print(cov_anchors)
 
