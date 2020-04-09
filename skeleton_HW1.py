@@ -18,9 +18,9 @@ scenario = 0
 def main():
     global scenario
     # choose the scenario
-    #scenario = 1    # all anchors are Gaussian
+    scenario = 1    # all anchors are Gaussian
     #scenario = 2    # 1 anchor is exponential, 3 are Gaussian
-    scenario = 3    # all anchors are exponential
+    #scenario = 3    # all anchors are exponential
     
     # specify position of anchors
     p_anchor = np.array([[5,5],[-5,5],[-5,-5],[5,-5]])
@@ -116,9 +116,11 @@ def position_estimation_least_squares(data,nr_anchors,p_anchor, p_true, use_expo
     nr_samples = np.size(data,0)
     #TODO set parameters
     tol = 10^(-4)  # tolerance
-    max_iter = 200  # maximum iterations for GN
+    max_iter = 2000  # maximum iterations for GN
     # TODO estimate position for  i in range(0, nr_samples)
-    p_start = [1,1]
+    p_start = np.zeros((2,1))
+    p_start[0] = 1
+    p_start[1] = 2
     for i in range(nr_samples):
         p_start = least_squares_GN(p_anchor,p_start, data[i], max_iter, tol)
 	# TODO calculate error measures and create plots----------------
@@ -157,21 +159,22 @@ def least_squares_GN(p_anchor,p_start, measurements_n, max_iter, tol):
         max_iter... maximum number of iterations, scalar
         tol... tolerance value to terminate, scalar"""
     # TODO
-    B = np.matrix([[1],[1]])
-    Jf = np.zeros((2000, 2)) # Jacobian matrix from r
-    r = np.zeros((2000,1))
-    for _ in range(max_iter):
-        #sumOfResid=0
-        #calculate Jr and r for this iteration.
-        for j in range(2000):
-            #r[j,0] = residual(measurements_n[j],,B[0],B[1])
-            #sumOfResid += (r[j,0] * r[j,0])
-            Jf[j,0] = partialDerB1(B[1],measurements_n[j])
-            Jf[j,1] = partialDerB2(B[0],B[1],measurements_n[j])
+    new_point = p_start
+    for i in range(max_iter) :
+        Jf = partial(p_anchor, p_start)
+        Jft = Jf.T
+        diff = distanceofPoint(new_point, p_anchor, measurements_n)
+        # saved for comparing for tollerance
+        p_start = new_point
+        new_point = np.subtract(new_point, np.dot(np.dot(inv(np.dot(Jft, Jf)), Jft), diff))
+        # to be corrected
+        if abs(new_point[0] - p_start[0]) <= tol :
+            print('TOLLERANCE REACHED BY INTER: ' + max_iter)
+        print(new_point)
 
-            old_B = B
-            B -=  np.dot(np.dot(inv(np.dot(Jft, Jf)), Jft), r)      #np.dot(np.dot(inv(np.dot(Jft,Jf)),Jft),r)
-    return B
+
+    print('END WITH POINT: ')
+    return new_point
     pass
     
 #--------------------------------------------------------------------------------
@@ -179,16 +182,23 @@ def least_squares_GN(p_anchor,p_start, measurements_n, max_iter, tol):
 # Helper Functions
 #--------------------------------------------------------------------------------
 
+# calculate the distance between the given point and the 4 anchors and after that
+# the difference between the calculated distance and the given measuraments
+def distanceofPoint(point, p_anchor, measurements): 
+    final = np.zeros((4,1))
+    for i in range(4) :
+        x = math.sqrt((point[0] - p_anchor[i][0])**2 + (point[1] - p_anchor[i][1])**2)
+        final[i] = (measurements[i] - x)
+    return final
 
+# calculate a 4x2 Jacobi matrix for the given point
+def partial(p_anchor, point):
+    Jf = np.zeros((4,2))
+    for i in range(4) :
+        Jf[i][0] = - (point[0] - p_anchor[i][0]) / (math.sqrt((point[0] - p_anchor[i][0])**2 + (point[1] - p_anchor[i][1])**2))
+        Jf[i][1] = - (point[1] - p_anchor[i][1]) / (math.sqrt((point[0] - p_anchor[i][0])**2 + (point[1] - p_anchor[i][1])**2))  
 
-def partialDerB1(B2,xi):
-   return -(xi/(B2+xi))
-
-def partialDerB2(B1,B2,xi):
-   return ((B1*xi)/((B2+xi)*(B2+xi)))
-
-def residual(x,y,B1,B2):
-   return (y - ((B1*x)/(B2+x)))
+    return Jf
 
 
 def plot_gauss_contour(mu,cov,xmin,xmax,ymin,ymax,title="Title"):
