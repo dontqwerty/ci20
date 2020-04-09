@@ -170,7 +170,7 @@ def least_squares_GN(p_anchor,p_start, measurements_n, max_iter, tol):
             Jf[j,1] = partialDerB2(B[0],B[1],measurements_n[j])
 
             old_B = B
-            B -=  np.dot(np.dot((np.dot(Jft, Jf)**-1), Jft), r)      #np.dot(np.dot(inv(np.dot(Jft,Jf)),Jft),r)
+            B -=  np.dot(np.dot(inv(np.dot(Jft, Jf)), Jft), r)      #np.dot(np.dot(inv(np.dot(Jft,Jf)),Jft),r)
     return B
     pass
     
