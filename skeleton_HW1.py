@@ -8,6 +8,8 @@ import scipy.stats as stats
 
 import seaborn as sns
 from scipy.stats import expon
+from numpy.linalg import inv
+import math
 
 scenario = 0
 
@@ -81,7 +83,7 @@ def parameter_estimation(reference_measurement,nr_anchors,p_anchor,p_ref):
                   color='skyblue',
                   hist_kws={"linewidth": 15,'alpha':1})
         ax.set(xlabel='Given Distribution', ylabel='Frequency')
-        plt.show() 
+        # plt.show() 
     #TODO (2) estimate the according parameter based
     t_reference_measurement = np.transpose(reference_measurement)
     t_reference_measurement_size = np.size(t_reference_measurement[0],0)
@@ -112,13 +114,13 @@ def position_estimation_least_squares(data,nr_anchors,p_anchor, p_true, use_expo
         p_true... true position (needed to calculate error) 2x2 
         use_exponential... determines if the exponential anchor in scenario 2 is used, bool"""
     nr_samples = np.size(data,0)
-    
     #TODO set parameters
-    #tol = ...  # tolerance
-    #max_iter = ...  # maximum iterations for GN
-    
+    tol = 10^(-4)  # tolerance
+    max_iter = 200  # maximum iterations for GN
     # TODO estimate position for  i in range(0, nr_samples)
-    # least_squares_GN(p_anchor,p_start, measurements_n, max_iter, tol)
+    p_start = [1,1]
+    for i in range(nr_samples):
+        p_start = least_squares_GN(p_anchor,p_start, data[i], max_iter, tol)
 	# TODO calculate error measures and create plots----------------
     pass
 #--------------------------------------------------------------------------------
@@ -155,12 +157,40 @@ def least_squares_GN(p_anchor,p_start, measurements_n, max_iter, tol):
         max_iter... maximum number of iterations, scalar
         tol... tolerance value to terminate, scalar"""
     # TODO
+    B = np.matrix([[1],[1]])
+    Jf = np.zeros((2000, 2)) # Jacobian matrix from r
+    r = np.zeros((2000,1))
+    for _ in range(max_iter):
+        #sumOfResid=0
+        #calculate Jr and r for this iteration.
+        for j in range(2000):
+            #r[j,0] = residual(measurements_n[j],,B[0],B[1])
+            #sumOfResid += (r[j,0] * r[j,0])
+            Jf[j,0] = partialDerB1(B[1],measurements_n[j])
+            Jf[j,1] = partialDerB2(B[0],B[1],measurements_n[j])
+
+            old_B = B
+            B -=  np.dot(np.dot((np.dot(Jft, Jf)**-1), Jft), r)      #np.dot(np.dot(inv(np.dot(Jft,Jf)),Jft),r)
+    return B
     pass
     
 #--------------------------------------------------------------------------------
 #--------------------------------------------------------------------------------
 # Helper Functions
 #--------------------------------------------------------------------------------
+
+
+
+def partialDerB1(B2,xi):
+   return -(xi/(B2+xi))
+
+def partialDerB2(B1,B2,xi):
+   return ((B1*xi)/((B2+xi)*(B2+xi)))
+
+def residual(x,y,B1,B2):
+   return (y - ((B1*x)/(B2+x)))
+
+
 def plot_gauss_contour(mu,cov,xmin,xmax,ymin,ymax,title="Title"):
     
     """ creates a contour plot for a bivariate gaussian distribution with specified parameters
