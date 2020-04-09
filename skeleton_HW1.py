@@ -114,7 +114,9 @@ def position_estimation_least_squares(data,nr_anchors,p_anchor, p_true, use_expo
         p_true... true position (needed to calculate error) 2x2 
         use_exponential... determines if the exponential anchor in scenario 2 is used, bool"""
     nr_samples = np.size(data,0)
+    
     #TODO set parameters
+<<<<<<< HEAD
     tol = 10^(-4)  # tolerance
     max_iter = 2000  # maximum iterations for GN
     # TODO estimate position for  i in range(0, nr_samples)
@@ -123,7 +125,27 @@ def position_estimation_least_squares(data,nr_anchors,p_anchor, p_true, use_expo
     p_start[1] = 2
     for i in range(nr_samples):
         p_start = least_squares_GN(p_anchor,p_start, data[i], max_iter, tol)
+=======
+    #tol = ...  # tolerance
+    #max_iter = ...  # maximum iterations for GN
+    tol = 10^(-4)
+    max_iter = 200
+
+    p_start = np.random.uniform(np.min(p_anchor), np.max(p_anchor), 2)
+    
+    # TODO estimate position for  i in range(0, nr_samples)
+    # least_squares_GN(p_anchor,p_start, measurements_n, max_iter, tol)
+>>>>>>> a9ab053c5652d62e893bc0e707e294297f2d40dd
 	# TODO calculate error measures and create plots----------------
+
+    # #TODO set parameters
+    # tol = 10^(-4)  # tolerance
+    # max_iter = 200  # maximum iterations for GN
+    # # TODO estimate position for  i in range(0, nr_samples)
+    # p_start = [1,1]
+    # for i in range(nr_samples):
+    #     p_start = least_squares_GN(p_anchor,p_start, data[i], max_iter, tol)
+	# # TODO calculate error measures and create plots----------------
     pass
 #--------------------------------------------------------------------------------
 def position_estimation_numerical_ml(data,nr_anchors,p_anchor, lambdas, p_true):
