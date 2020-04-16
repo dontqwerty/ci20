@@ -10,6 +10,8 @@ import seaborn as sns
 from scipy.stats import expon
 from numpy.linalg import inv
 import math
+from copy import copy, deepcopy
+import statistics
 
 scenario = 0
 
@@ -18,9 +20,9 @@ scenario = 0
 def main():
     global scenario
     # choose the scenario
-    scenario = 1    # all anchors are Gaussian
+    #scenario = 1    # all anchors are Gaussian
     #scenario = 2    # 1 anchor is exponential, 3 are Gaussian
-    #scenario = 3    # all anchors are exponential
+    scenario = 3    # all anchors are exponential
     
     # specify position of anchors
     p_anchor = np.array([[5,5],[-5,5],[-5,-5],[5,-5]])
@@ -83,7 +85,7 @@ def parameter_estimation(reference_measurement,nr_anchors,p_anchor,p_ref):
                   color='skyblue',
                   hist_kws={"linewidth": 15,'alpha':1})
         ax.set(xlabel='Given Distribution', ylabel='Frequency')
-        # plt.show() 
+        plt.show() 
     #TODO (2) estimate the according parameter based
     t_reference_measurement = np.transpose(reference_measurement)
     t_reference_measurement_size = np.size(t_reference_measurement[0],0)
@@ -116,25 +118,62 @@ def position_estimation_least_squares(data,nr_anchors,p_anchor, p_true, use_expo
     nr_samples = np.size(data,0)
     
     #TODO set parameters
-    #tol = ...  # tolerance
-    #max_iter = ...  # maximum iterations for GN
-    tol = 10^(-4)
-    max_iter = 200
+    tol = 0.0001 # valid, tested
+    max_iter = 8 # valid, tested
 
+    results = np.zeros((2000, 2)) # for collecting the estimated points
+    errors = [] # for collecting the difference between estimated points and p_true
     p_start = np.random.uniform(np.min(p_anchor), np.max(p_anchor), 2)
     
     # TODO estimate position for  i in range(0, nr_samples)
-    # least_squares_GN(p_anchor,p_start, measurements_n, max_iter, tol)
+    for i in range(2000):
+        results[i] = least_squares_GN(p_anchor,p_start, data[i], max_iter, tol)
+        errors.append(math.sqrt((p_true[0][0] - results[i][0])**2 + (p_true[0][1] - results[i][1])**2))
+
 	# TODO calculate error measures and create plots----------------
 
-    # #TODO set parameters
-    # tol = 10^(-4)  # tolerance
-    # max_iter = 200  # maximum iterations for GN
-    # # TODO estimate position for  i in range(0, nr_samples)
-    # p_start = [1,1]
-    # for i in range(nr_samples):
-    #     p_start = least_squares_GN(p_anchor,p_start, data[i], max_iter, tol)
-	# # TODO calculate error measures and create plots----------------
+    # probably mean and variance are not to be calculated so
+    # print(statistics.mean(errors))
+    # print(statistics.variance(errors))
+
+    # plot with anchor, p_true and estimated points
+    plt.scatter(results[:,0],results[:,1])
+    plt.axis([-8, 8, -8, 8])
+    for i in range(0, nr_anchors):
+        plt.plot(p_anchor[i, 0], p_anchor[i, 1], 'bo')
+        plt.text(p_anchor[i, 0] + 0.2, p_anchor[i, 1] + 0.2, r'$p_{a,' + str(i) + '}$')
+    plt.plot(p_true[0, 0], p_true[0, 1], 'r*')
+    plt.text(p_true[0, 0] + 0.2, p_true[0, 1] + 0.2, r'$p_{true}$')
+    plt.xlabel("x/m")
+    plt.ylabel("y/m")
+    plt.show()
+
+    # plot with overlay of the contour plots over the estimated points
+    mu = results.mean(axis=0)
+    cov = np.cov(results.T)
+
+    #just for defining size of plot
+    if (scenario == 1) :
+        ymin = -5
+        ymax = -3
+        xmin = 1
+        xmax = 3
+    elif (scenario == 2) :
+        ymin = -8
+        ymax = 0
+        xmin = -2
+        xmax = 6
+    elif (scenario == 3):
+        ymin = -8
+        ymax = 8
+        xmin = -8
+        xmax = 8
+
+    plot_gauss_contour(mu, cov, xmin,xmax,ymin,ymax)
+    plt.axis([xmin,xmax,ymin,ymax])
+    plt.scatter(results[:,0],results[:,1],)
+    plt.show()
+
     pass
 #--------------------------------------------------------------------------------
 def position_estimation_numerical_ml(data,nr_anchors,p_anchor, lambdas, p_true):
@@ -169,22 +208,23 @@ def least_squares_GN(p_anchor,p_start, measurements_n, max_iter, tol):
         measurements_n... distance_estimate, nr_anchors x 1
         max_iter... maximum number of iterations, scalar
         tol... tolerance value to terminate, scalar"""
-    # TODO
     new_point = p_start
+    
     for i in range(max_iter) :
+
         Jf = partial(p_anchor, p_start)
         Jft = Jf.T
         diff = distanceofPoint(new_point, p_anchor, measurements_n)
         # saved for comparing for tollerance
-        p_start = new_point
-        new_point = np.subtract(new_point, np.dot(np.dot(inv(np.dot(Jft, Jf)), Jft), diff))
-        # to be corrected
-        if abs(new_point[0] - p_start[0]) <= tol :
-            print('TOLLERANCE REACHED BY INTER: ' + max_iter)
-        print(new_point)
+        p_start = deepcopy(new_point)
 
+        Jft_result = np.dot(np.dot(inv(np.dot(Jft, Jf)), Jft), diff)
+        new_point[0]  -= Jft_result[0] 
+        new_point[1]  -= Jft_result[1]
 
-    print('END WITH POINT: ')
+        if (((abs(new_point[0]) - abs(p_start[0])) <= tol) & ((abs(new_point[1]) - abs(p_start[1])) <= tol)):
+            break
+
     return new_point
     pass
     
@@ -195,7 +235,8 @@ def least_squares_GN(p_anchor,p_start, measurements_n, max_iter, tol):
 
 # calculate the distance between the given point and the 4 anchors and after that
 # the difference between the calculated distance and the given measuraments
-def distanceofPoint(point, p_anchor, measurements): 
+def distanceofPoint(point, p_anchor, measurements):
+
     final = np.zeros((4,1))
     for i in range(4) :
         x = math.sqrt((point[0] - p_anchor[i][0])**2 + (point[1] - p_anchor[i][1])**2)
@@ -228,13 +269,13 @@ def plot_gauss_contour(mu,cov,xmin,xmax,ymin,ymax,title="Title"):
     X, Y = np.mgrid[xmin:xmax:delta, ymin:ymax:delta]
     pos = np.dstack((X, Y))
                     
-    Z = np.stats.multivariate_normal(mu, cov)
+    Z = stats.multivariate_normal(mu, cov)
     plt.plot([mu[0]],[mu[1]],'r+') # plot the mean as a single point
     plt.gca().set_aspect("equal")
     CS = plt.contour(X, Y, Z.pdf(pos),3,colors='r')
     plt.clabel(CS, inline=1, fontsize=10)
     plt.title(title)
-    plt.show()
+    #plt.show()
     return
 
 #--------------------------------------------------------------------------------
