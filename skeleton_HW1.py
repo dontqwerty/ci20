@@ -20,9 +20,9 @@ scenario = 0
 def main():
     global scenario
     # choose the scenario
-    #scenario = 1    # all anchors are Gaussian
+    scenario = 1    # all anchors are Gaussian
     #scenario = 2    # 1 anchor is exponential, 3 are Gaussian
-    scenario = 3    # all anchors are exponential
+    #scenario = 3    # all anchors are exponential
     
     # specify position of anchors
     p_anchor = np.array([[5,5],[-5,5],[-5,-5],[5,-5]])
@@ -133,11 +133,11 @@ def position_estimation_least_squares(data,nr_anchors,p_anchor, p_true, use_expo
 	# TODO calculate error measures and create plots----------------
 
     # probably mean and variance are not to be calculated so
-    # print(statistics.mean(errors))
-    # print(statistics.variance(errors))
+    print(statistics.mean(errors))
+    print(statistics.variance(errors))
 
     # plot with anchor, p_true and estimated points
-    plt.scatter(results[:,0],results[:,1])
+    # plt.scatter(results[:,0],results[:,1])
     
     plot_anchors_and_agent(nr_anchors, p_anchor, p_true)
     plt.scatter(results[:,0],results[:,1], c='green')
@@ -145,6 +145,11 @@ def position_estimation_least_squares(data,nr_anchors,p_anchor, p_true, use_expo
 
     plt.show()
 
+    Fx,x = ecdf(errors)
+    plt.plot(x, Fx)
+    plt.axis([0, 6.2, 0, 1.2])
+    plt.show()
+    
     # plot with overlay of the contour plots over the estimated points
     mu = results.mean(axis=0)
     cov = np.cov(results.T)
