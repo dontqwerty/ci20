@@ -21,8 +21,8 @@ GN_mod = False # Used for 3.2: if True neglect the exp. distr. anchor to analyze
 def main():
     global scenario
     # choose the scenario
-    # scenario = 1    # all anchors are Gaussian
-    # scenario = 2    # 1 anchor is exponential, 3 are Gaussian
+    #scenario = 1    # all anchors are Gaussian
+    #scenario = 2    # 1 anchor is exponential, 3 are Gaussian
     scenario = 3    # all anchors are exponential
     
     # specify position of anchors
