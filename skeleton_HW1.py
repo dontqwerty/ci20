@@ -14,7 +14,7 @@ from copy import copy, deepcopy
 import statistics
 
 scenario = 0
-GN_mod = True # Used for 3.2: if True neglect the exp. distr. anchor to analyze differences
+GN_mod = False # Used for 3.2: if True neglect the exp. distr. anchor to analyze differences
 
 #--------------------------------------------------------------------------------
 # Assignment 1
@@ -22,8 +22,8 @@ def main():
     global scenario
     # choose the scenario
     # scenario = 1    # all anchors are Gaussian
-    scenario = 2    # 1 anchor is exponential, 3 are Gaussian
-    #scenario = 3    # all anchors are exponential
+    # scenario = 2    # 1 anchor is exponential, 3 are Gaussian
+    scenario = 3    # all anchors are exponential
     
     # specify position of anchors
     p_anchor = np.array([[5,5],[-5,5],[-5,-5],[5,-5]])
@@ -86,7 +86,7 @@ def parameter_estimation(reference_measurement,nr_anchors,p_anchor,p_ref):
                   color='skyblue',
                   hist_kws={"linewidth": 15,'alpha':1})
         ax.set(xlabel='Given Distribution', ylabel='Frequency')
-        plt.show() 
+        plt.show()
     #TODO (2) estimate the according parameter based
     t_reference_measurement = np.transpose(reference_measurement)
     t_reference_measurement_size = np.size(t_reference_measurement[0],0)
@@ -137,17 +137,26 @@ def position_estimation_least_squares(data,nr_anchors,p_anchor, p_true, use_expo
     print(statistics.mean(errors))
     print(statistics.variance(errors))
 
+    plt.scatter(results[:,0],results[:,1])
+    plt.title('Estimation of Points')
+    plt.ylabel('y/m')
+    plt.xlabel('x/m')
+    plt.show()
+
     # plot with anchor, p_true and estimated points
-    # plt.scatter(results[:,0],results[:,1])
     
     plot_anchors_and_agent(nr_anchors, p_anchor, p_true)
     plt.scatter(results[:,0],results[:,1], c='green')
+    plt.title('Estimation of Points')
     plt.axis([-8, 8, -8, 8])
 
     plt.show()
 
     Fx,x = ecdf(errors)
     plt.plot(x, Fx)
+    plt.title('CDF - Estimastion of Points Error')
+    plt.ylabel('Cumulative Probability')
+    plt.xlabel('Squared error')
     plt.show()
     
     # plot with overlay of the contour plots over the estimated points
@@ -173,6 +182,9 @@ def position_estimation_least_squares(data,nr_anchors,p_anchor, p_true, use_expo
 
     plot_gauss_contour(mu, cov, xmin,xmax,ymin,ymax)
     plt.axis([xmin,xmax,ymin,ymax])
+    plt.title('Gauss Contour of Estimated Points')
+    plt.ylabel('y/m')
+    plt.xlabel('x/m')
     plt.scatter(results[:,0],results[:,1],)
     plt.show()
 
@@ -266,7 +278,7 @@ def partial(p_anchor, point):
         return Jf
 
 
-def plot_gauss_contour(mu,cov,xmin,xmax,ymin,ymax,title="Title"):
+def plot_gauss_contour(mu,cov,xmin,xmax,ymin,ymax):
     
     """ creates a contour plot for a bivariate gaussian distribution with specified parameters
     
@@ -287,7 +299,6 @@ def plot_gauss_contour(mu,cov,xmin,xmax,ymin,ymax,title="Title"):
     plt.gca().set_aspect("equal")
     CS = plt.contour(X, Y, Z.pdf(pos),3,colors='r')
     plt.clabel(CS, inline=1, fontsize=10)
-    plt.title(title)
     #plt.show()
     return
 
