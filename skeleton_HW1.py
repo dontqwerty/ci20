@@ -14,14 +14,15 @@ from copy import copy, deepcopy
 import statistics
 
 scenario = 0
+GN_mod = True # Used for 3.2: if True neglect the exp. distr. anchor to analyze differences
 
 #--------------------------------------------------------------------------------
 # Assignment 1
 def main():
     global scenario
     # choose the scenario
-    scenario = 1    # all anchors are Gaussian
-    #scenario = 2    # 1 anchor is exponential, 3 are Gaussian
+    # scenario = 1    # all anchors are Gaussian
+    scenario = 2    # 1 anchor is exponential, 3 are Gaussian
     #scenario = 3    # all anchors are exponential
     
     # specify position of anchors
@@ -147,7 +148,6 @@ def position_estimation_least_squares(data,nr_anchors,p_anchor, p_true, use_expo
 
     Fx,x = ecdf(errors)
     plt.plot(x, Fx)
-    plt.axis([0, 6.2, 0, 1.2])
     plt.show()
     
     # plot with overlay of the contour plots over the estimated points
@@ -228,7 +228,6 @@ def least_squares_GN(p_anchor,p_start, measurements_n, max_iter, tol):
             break
 
     return new_point
-    pass
     
 #--------------------------------------------------------------------------------
 #--------------------------------------------------------------------------------
@@ -238,21 +237,33 @@ def least_squares_GN(p_anchor,p_start, measurements_n, max_iter, tol):
 # calculate the distance between the given point and the 4 anchors and after that
 # the difference between the calculated distance and the given measuraments
 def distanceofPoint(point, p_anchor, measurements):
+    global scenario
+    global GN_mod
 
     final = np.zeros((4,1))
     for i in range(4) :
         x = math.sqrt((point[0] - p_anchor[i][0])**2 + (point[1] - p_anchor[i][1])**2)
         final[i] = (measurements[i] - x)
-    return final
+
+    if (scenario == 2 and GN_mod):
+        return final[1:4] # only return the gaussian distributed anchors
+    else:
+        return final
 
 # calculate a 4x2 Jacobi matrix for the given point
 def partial(p_anchor, point):
+    global scenario
+    global GN_mod
+
     Jf = np.zeros((4,2))
     for i in range(4) :
         Jf[i][0] = - (point[0] - p_anchor[i][0]) / (math.sqrt((point[0] - p_anchor[i][0])**2 + (point[1] - p_anchor[i][1])**2))
         Jf[i][1] = - (point[1] - p_anchor[i][1]) / (math.sqrt((point[0] - p_anchor[i][0])**2 + (point[1] - p_anchor[i][1])**2))  
 
-    return Jf
+    if (scenario == 2 and GN_mod):
+        return Jf[1:4][:] # only return the gaussian distributed anchors
+    else:
+        return Jf
 
 
 def plot_gauss_contour(mu,cov,xmin,xmax,ymin,ymax,title="Title"):
