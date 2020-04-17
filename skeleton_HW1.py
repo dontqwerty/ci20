@@ -138,14 +138,11 @@ def position_estimation_least_squares(data,nr_anchors,p_anchor, p_true, use_expo
 
     # plot with anchor, p_true and estimated points
     plt.scatter(results[:,0],results[:,1])
+    
+    plot_anchors_and_agent(nr_anchors, p_anchor, p_true)
+    plt.scatter(results[:,0],results[:,1], c='green')
     plt.axis([-8, 8, -8, 8])
-    for i in range(0, nr_anchors):
-        plt.plot(p_anchor[i, 0], p_anchor[i, 1], 'bo')
-        plt.text(p_anchor[i, 0] + 0.2, p_anchor[i, 1] + 0.2, r'$p_{a,' + str(i) + '}$')
-    plt.plot(p_true[0, 0], p_true[0, 1], 'r*')
-    plt.text(p_true[0, 0] + 0.2, p_true[0, 1] + 0.2, r'$p_{true}$')
-    plt.xlabel("x/m")
-    plt.ylabel("y/m")
+
     plt.show()
 
     # plot with overlay of the contour plots over the estimated points
@@ -327,7 +324,7 @@ def plot_anchors_and_agent(nr_anchors, p_anchor, p_true, p_ref=None):
         plt.text(p_ref[0, 0] + 0.2, p_ref[0, 1] + 0.2, '$p_{ref}$')
     plt.xlabel("x/m")
     plt.ylabel("y/m")
-    plt.show()
+    #plt.show()
     pass
 
 #--------------------------------------------------------------------------------
