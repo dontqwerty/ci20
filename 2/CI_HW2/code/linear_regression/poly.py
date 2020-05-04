@@ -91,6 +91,10 @@ def train(x, y, degree):
                 X[j][i] = 1
             else :
                 X[j][i] = np.power(x[j], i)
+    
+    X_shape = X.shape[0]
+    
+    X_ext = np.hstack((np.ones((X_shape, 1)), X))
 
 
     theta_opt = np.zeros(degree + 1)  # TODO: Change me
