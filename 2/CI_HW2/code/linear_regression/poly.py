@@ -148,7 +148,7 @@ def compute_error(theta, degree, x, y):
     # END TODO
     ######################
 
-    return err
+    return np.mean(err)
 
 
 def train_and_test(data, degree):
