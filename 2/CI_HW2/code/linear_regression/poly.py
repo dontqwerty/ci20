@@ -132,8 +132,17 @@ def compute_error(theta, degree, x, y):
     #               Then * becomes a matrix multiplication
     #
     #  - One can use the numpy function mean
+    X = np.zeros(x.size(), degree+1)
+    for i in range(degree + 1):
+        for j in range(x) :
+            if (j == 0) :
+                X[j][i] = 1
+            else :
+                X[j][i] = np.power(x[j], i)
 
-    err = -1  # TODO: Change me
+    x_matrix = np.matrix(X)     
+    y_pred = x_matrix.dot(theta)
+    err = (y_pred - y)
 
     #
     # END TODO
