@@ -40,9 +40,9 @@ def design_matrix(x, degree):
     # Look at the function description for more info
     #
     # TIP: use the power function from numpy
-    X = np.zeros(x.size(), degree+1)
+    X = np.zeros([np.size(x), degree+1])
     for i in range(degree + 1):
-        for j in range(x) :
+        for j in range(np.size(x)) :
             if (j == 0) :
                 X[j][i] = 1
             else :
@@ -84,9 +84,9 @@ def train(x, y, degree):
     #  - To compute the pseudo inverse (A*A.T)^-1 * A.T with a more stable algorithm numpy provides the function pinv
     #   pinv is accessible in the sub-library numpy.linalg
     #
-    X = np.zeros(x.size(), degree+1)
+    X = np.zeros([np.size(x), degree+1])
     for i in range(degree + 1):
-        for j in range(x) :
+        for j in range(np.size(x)) :
             if (j == 0) :
                 X[j][i] = 1
             else :
@@ -98,8 +98,9 @@ def train(x, y, degree):
 
 
     theta_opt = np.zeros(degree + 1)  # TODO: Change me
-    for r in range(theta_opt) :
-        theta_opt[r] = np.dot(np.linalg.pinv(X), y)
+    # for r in range(np.size(theta_opt)) :
+    theta_opt = np.dot(np.linalg.pinv(X), y)
+
 
     # END TODO
     ######################
@@ -132,9 +133,9 @@ def compute_error(theta, degree, x, y):
     #               Then * becomes a matrix multiplication
     #
     #  - One can use the numpy function mean
-    X = np.zeros(x.size(), degree+1)
+    X = np.zeros([np.size(x), degree+1])
     for i in range(degree + 1):
-        for j in range(x) :
+        for j in range(np.size(x)) :
             if (j == 0) :
                 X[j][i] = 1
             else :
@@ -149,7 +150,6 @@ def compute_error(theta, degree, x, y):
     ######################
 
     return np.mean(err)
-
 
 def train_and_test(data, degree):
     """
