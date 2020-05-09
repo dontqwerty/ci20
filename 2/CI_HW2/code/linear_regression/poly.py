@@ -92,14 +92,18 @@ def train(x, y, degree):
             else :
                 X[j][i] = np.power(x[j], i)
     
-    X_shape = X.shape[0]
     
-    X_ext = np.hstack((np.ones((X_shape, 1)), X))
-
 
     theta_opt = np.zeros(degree + 1)  # TODO: Change me
     # for r in range(np.size(theta_opt)) :
-    theta_opt = np.dot(np.linalg.pinv(X), y)
+    
+    X_ident = np.zeros([np.size(x), degree+1])
+    for i in range(np.size(x)) :
+        for j in range(degree + 1) :
+            if (i == j) & i < (degree + 1) :
+                X_ident[i][j] = 1
+    
+    theta_opt = np.dot(np.linalg.pinv(X + X_ident), y)
 
 
     # END TODO
@@ -143,8 +147,11 @@ def compute_error(theta, degree, x, y):
 
     x_matrix = np.matrix(X)     
     y_pred = x_matrix.dot(theta)
-    err = (y_pred - y)
-
+    # err = (y_pred - y)
+    err = []
+    
+    for i in range(np.size(y_pred)) :
+        err.append((y_pred[i] - y[i]) ** 2)
     #
     # END TODO
     ######################

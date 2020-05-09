@@ -52,22 +52,25 @@ def main():
     # TIPs:
     # - use the argmin function of numpy
     # - the code above is already giving the vectors of errors
-    i_best = 0  # TODO: Change this
-    best_error = np.argmin(mse_val)
-    for i in range(np.size(mse_val)) :
-        if mse_val[i] == best_error :
+    i_best_val = np.argmin(mse_val) # TODO: Change this
+    best_degree_val = degrees[i_best_val]
+    best_theta_val = theta_list[i_best_val]
 
-            best_degree = degrees[i]
-            best_theta = theta_list[i]
-            i_best = i
-            break
+    i_best_tr = np.argmin(mse_train) # TODO: Change this
+    best_degree_tr = degrees[i_best_tr]
+    best_theta_tr = theta_list[i_best_tr]
+
     #
     # END TODO
     ######################
 
     # Plot the training error as a function of the degrees
-    plot_errors(i_best, degrees, mse_train, mse_val, mse_test)
-    plot_poly(data, best_degree, best_theta)
+    plot_errors(i_best_val, degrees, mse_train, mse_val, mse_test)
+    plot_poly(data, best_degree_val, best_theta_val)
+    plt.show()
+
+    plot_errors(i_best_tr, degrees, mse_train, mse_val, mse_test)
+    plot_poly(data, best_degree_tr, best_theta_tr)
     plt.show()
 
 
