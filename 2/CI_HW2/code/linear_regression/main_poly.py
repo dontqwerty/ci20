@@ -20,10 +20,10 @@ TODO boxes are to be found in 'poly.py'
 
 def main():
     # Set the degree of the polynomial expansion
-    # degree = 1
+    degree = 1
     # degree = 5
     # degree = 10
-    degree = 22
+    # degree = 22
     data_path = 'data_linreg.json'
 
     # Load the data

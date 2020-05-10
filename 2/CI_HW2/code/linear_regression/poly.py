@@ -101,7 +101,7 @@ def train(x, y, degree):
     for i in range(np.size(x)) :
         for j in range(degree + 1) :
             if (i == j) & i < (degree + 1) :
-                X_ident[i][j] = 1
+                X_ident[i][j] = 0    # used Lambda -> 0.5 (too small) / 0.55 (also too small but better) / 0.8 fine / 0 just to show the result without regularization
     
     theta_opt = np.dot(np.linalg.pinv(X + X_ident), y)
 
