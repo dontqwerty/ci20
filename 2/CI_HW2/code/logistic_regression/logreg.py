@@ -37,7 +37,12 @@ def cost(theta, x, y):
     #   log(x + epsilon) with epsilon a very small number like 1e-20
     #   or 1e-10 but the gradients might not be exact anymore. 
 
+  
     c = 0
+    c = -1/N * (y*np.log(sig(np.dot(x,theta)))+(1-y)*np.log(1-sig(np.dot(x,theta))))
+
+    
+    c = c.sum()
 
     # END TODO
     ###########
@@ -63,8 +68,14 @@ def grad(theta, x, y):
     #
     #   - prefer numpy vectorized operations over for loops
 
+ #   print("1 ",np.dot(x,theta))
+   # print("2 ",np.dot(x[0],theta))
     g = np.zeros(theta.shape)
-
+   
+    for j in range (0,n):
+        for i in range (0,N):
+            g[j] += 1/N * ((sig(np.dot(x[i],theta))-y[i])*x[i][j])
+    
     # END TODO
     ###########
 
