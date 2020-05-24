@@ -183,5 +183,21 @@ def ex_1_2(x_train, x_test, y_train, y_test):
     :return:
     """
     ## TODO#
+    nh = 50
+    alp = [0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100]
+    seed = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    iterations = 5000
+    mse_all_train = np.zeros(shape=(9,10))
+    mse_all_test  = np.zeros(shape=(9,10))
+    for j in range(0,9):
+        for i in range(0, 10) :
+            nn = MLPRegressor(activation='logistic',solver='lbfgs',max_iter=5000,alpha= alp[j], hidden_layer_sizes=(50,), random_state=seed[i])         #for i in range(0,iterations):
+            nn.fit(x_train,y_train)
+            mse_train = calculate_mse(nn, x_train, y_train)
+            mse_test  = calculate_mse(nn, x_test, y_test)
+            mse_all_train[j][i] = mse_train
+            mse_all_test[j][i] = mse_test
+            
+    plot_mse_vs_alpha(mse_all_train, mse_all_test, alp)
    
     pass
