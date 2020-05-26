@@ -42,13 +42,34 @@ def ex_2_1(X_train, y_train, X_test, y_test):
     ## TODO
     train_accuracy = [0,0,0,0,0]
     test_accuracy = [0,0,0,0,0]
+    clf = [0,0,0,0,0]
     for seed in range(1, 6):
-      clf = MLPClassifier(hidden_layer_sizes=(100,), activation='tanh',
-                          max_iter=50, random_state=seed)
-      clf.fit(X_train, y_train)
-      train_accuracy[seed-1] = clf.score(X_train, y_train)
-      test_accuracy[seed-1] = clf.score(X_test, y_test)
+      clf[seed -1] = MLPClassifier(hidden_layer_sizes=(10,), activation='tanh',
+                          max_iter=50, random_state=(seed * 3))
+      clf[seed -1].fit(X_train, y_train)
+      train_accuracy[seed-1] = clf[seed -1].score(X_train, y_train)
+      test_accuracy[seed-1] = clf[seed -1].score(X_test, y_test)
 
-    print(train_accuracy)
-    print(test_accuracy)
+      print(train_accuracy[seed-1])
+      print(test_accuracy[seed-1])
+    plot_boxplot(train_accuracy, test_accuracy)
+
+    y_test_pred = clf[4].predict(X_test)
+    confusion = confusion_matrix(y_test, y_test_pred)
+
+    # plot misclass
+    misclass_coun = 0
+    for ix, y in enumerate(y_test):
+      if (y != y_test_pred[ix]):
+        plot_image(X_test[ix])
+        misclass_coun += 1
+      if misclass_coun == 3:
+        break
+
+    # TODO: plot missclassified images based on confusion matrix
+    print(confusion)
+
+    # TODO: plot weights between input and hidden
+    plot_hidden_layer_weights(clf[4].coefs_[0])
+
     pass
