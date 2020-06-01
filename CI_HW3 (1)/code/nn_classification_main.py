@@ -43,7 +43,7 @@ def main():
     X_test, y_test = load_mnist('data', kind='t10k')
 
     ## Plot some random images
-    plot_random_images(X_train)
+    # plot_random_images(X_train)
     ## End plot some random images
 
     ## 2.1
