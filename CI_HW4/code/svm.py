@@ -1,4 +1,5 @@
 import numpy as np
+import numpy as np
 from sklearn import svm
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import confusion_matrix
@@ -131,13 +132,18 @@ def ex_2_b(x_train, y_train, x_test, y_test):
         test_scores.append(clf.score(x_test, y_test))
         train_scores.append(clf.score(x_train, y_train))
     plot_score_vs_degree(train_scores, test_scores, degrees)
-    # j = 1
-    # for i in range(21):
-    #     if test_scores[j] <= test_scores[i] :
-    #         j = i
-    clf = svm.SVC(kernel='poly', degree=3, coef0=1)
-    clf.fit(x_train, y_train)
-    plot_svm_decision_boundary(clf, x_train, y_train, x_test, y_test)  
+    j = max(test_scores)
+    best_degree = 0
+    for i in range(0, 21):
+        if test_scores[i] == j :
+            best_degree = i
+            clf = svm.SVC(kernel='poly', degree=i, coef0=1)
+            clf.fit(x_train, y_train)
+            plot_svm_decision_boundary(clf, x_train, y_train, x_test, y_test)
+            print(clf.score(x_test, y_test))
+            print(best_degree)
+            break
+    
 
 
 def ex_2_c(x_train, y_train, x_test, y_test):
@@ -166,13 +172,15 @@ def ex_2_c(x_train, y_train, x_test, y_test):
         test_scores.append(clf.score(x_test, y_test))
         train_scores.append(clf.score(x_train, y_train))
     plot_score_vs_gamma(train_scores, test_scores, gammas)
-    # j = 1
-    # for i in range(21):
-    #     if test_scores[j] <= test_scores[i] :
-    #         j = i
-    clf = svm.SVC(kernel='rbf', gamma=1.99)
+
+    j = max(test_scores)
+    best_gamma = test_scores.index(j)
+    
+    clf = svm.SVC(kernel='rbf', gamma=gammas[best_gamma])
     clf.fit(x_train, y_train)
     plot_svm_decision_boundary(clf, x_train, y_train, x_test, y_test)
+    print(clf.score(x_test, y_test))
+    print(gammas[best_gamma])
 
 
 def ex_3_a(x_train, y_train, x_test, y_test):
