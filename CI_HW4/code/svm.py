@@ -200,8 +200,25 @@ def ex_3_a(x_train, y_train, x_test, y_test):
     ## - plot the scores with varying gamma using the function plot_score_versus_gamma
     ## - Note that the chance level is not .5 anymore and add the score obtained with the linear kernel as optional argument of this function (parameter baseline)
     ###########
-
-
+   
+    gammas= [1e-5,1e-4,1e-3,1e-2,1e-1,1,10,1e2,1e3,1e4,1e5]
+    decision_function_shape='ovr'
+    train_scores = list()
+    test_scores = list()
+  
+    clf_lin= svm.SVC(kernel='linear',C=10)
+    clf_lin.fit(x_train,y_train)
+    test_scores_lin = (clf_lin.score(x_test, y_test))
+    train_scores_lin = (clf_lin.score(x_train, y_train))
+    for j in range(0,11):
+        
+        clf = svm.SVC(decision_function_shape='ovr',kernel='rbf',gamma=gammas[j],C=10)
+        clf.fit(x_train,y_train)
+        test_scores.append(clf.score(x_test, y_test))
+        train_scores.append(clf.score(x_train, y_train))
+        
+    plot_score_vs_gamma(train_scores,test_scores,gammas,lin_score_train=train_scores_lin,lin_score_test=test_scores_lin,baseline=.2)
+  
 def ex_3_b(x_train, y_train, x_test, y_test):
     """
     Solution for exercise 3 b)
@@ -219,11 +236,26 @@ def ex_3_b(x_train, y_train, x_test, y_test):
     ## Plot the confusion matrix with plot_confusion_matrix.
     ## Plot the first 10 images classified as the most misclassified digit using plot_mnist.
     ###########
+    
+    clf = svm.SVC(kernel="linear",decision_function_shape='ovr',C=10)
+    clf.fit(x_train,y_train)
+    y_pred =clf.predict(x_test)
 
     labels = range(1, 6)
 
-    sel_err = np.array([0])  # CHANGE ME! Numpy indices to select all images that are misclassified.
+    plot_confusion_matrix(confusion_matrix(y_test, y_pred), labels)
+    print("conf: ",confusion_matrix(y_test, y_pred))
+   
+    sel_err = np.array([9,25,643,654,668,685,696,727,738,739])  # CHANGE ME! Numpy indices to select all images that are misclassified.
     i = 0  # CHANGE ME! Should be the label number corresponding the largest classification error.
-
+    i=2
+    j= 0
+    print("sel_err ",sel_err)
+  
+    for k in range(0,y_test.size):
+        if y_pred[k] == 3 and y_test[k] != 3:
+             #sel_err[j] = k
+             print("k: ",k) 
+             j+=1
     # Plot with mnist plot
     plot_mnist(x_test[sel_err], y_pred[sel_err], labels=labels[i], k_plots=10, prefix='Predicted class')
