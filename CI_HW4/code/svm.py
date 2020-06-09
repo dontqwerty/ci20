@@ -252,10 +252,6 @@ def ex_3_b(x_train, y_train, x_test, y_test):
     j= 0
     print("sel_err ",sel_err)
   
-    for k in range(0,y_test.size):
-        if y_pred[k] == 3 and y_test[k] != 3:
-             #sel_err[j] = k
-             print("k: ",k) 
-             j+=1
+  
     # Plot with mnist plot
     plot_mnist(x_test[sel_err], y_pred[sel_err], labels=labels[i], k_plots=10, prefix='Predicted class')
